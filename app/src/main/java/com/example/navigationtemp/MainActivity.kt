@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), DetectLocation.UpdateUI {
         binding.longitudeText.text = longitude
         val dis_m = distance * 1000
         binding.distance.text = "Distance = " + String.format("%.3f", dis_m) + "m"
-        if(dis_m > 10000){
+        if(dis_m > 100){
             binding.status.text = "False"
         }else{
             binding.status.text = "True"
