@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Looper
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -25,7 +24,7 @@ import kotlin.math.*
 private const val TAG = "DetectLocation"
 class DetectLocation(private val context: Context, val listener: UpdateUI){
     interface UpdateUI{
-        fun updateText(latitude: String, longitude: String)
+        fun updateText(latitude: String, longitude: String, distance: Double)
         fun makeProgressBarVisible()
         fun makeProgressBarInvisible()
     }
@@ -38,9 +37,11 @@ class DetectLocation(private val context: Context, val listener: UpdateUI){
     }
     val LOCATION_PERMISSION_ID = 1000
 
-    private val finalLatitude = 18.4414
-    private val finalLongitude = 73.8010
-    val getLoc = GetLoc()
+//    private val finalLatitude = 18.4414
+//    private val finalLongitude = 73.8010
+    private val finalLatitude = 18.4636
+    private val finalLongitude = 73.8682
+    private val getLoc = GetLoc()
 
     fun location() {
         if(checkLocationPermission()){
@@ -121,7 +122,7 @@ class DetectLocation(private val context: Context, val listener: UpdateUI){
             Log.d(TAG, "Location Services not enables by the user")
         }
     }
-    private fun calculateDistance(finalLatitude: String, finalLongitude: String, latitude: String, longitude: String){
+    private fun calculateDistance(finalLatitude: String, finalLongitude: String, latitude: String, longitude: String): Double {
         val destinationLat = finalLatitude.toDouble()/(180/ PI)
         val destinationLong = finalLongitude.toDouble()/(180/ PI)
         val currentLat = latitude.toDouble()/(180/ PI)
@@ -134,14 +135,15 @@ class DetectLocation(private val context: Context, val listener: UpdateUI){
         val r = 6371
         val distance = (c * r)
         Toast.makeText(context, "Distance = $distance", Toast.LENGTH_LONG).show()
+        return distance
     }
 
     inner class GetLoc: CoroutineAsyncTask<LocationRequest, Void, Array<String>>(){
         @SuppressLint("MissingPermission")
         override fun doInBackground(vararg params: LocationRequest) {
             Log.d(TAG, "doInBackground: Start with treah ID: ${Thread.currentThread().id}")
-            var lat: String = ""
-            var lon: String = ""
+            var lat = ""
+            var lon = ""
 
             val locationCallback = object : LocationCallback(){
                 override fun onLocationResult(locationResult: LocationResult) {
@@ -184,15 +186,17 @@ class DetectLocation(private val context: Context, val listener: UpdateUI){
                 Log.d(TAG, "onPostExecute: starts, thread ID: ${Thread.currentThread().id}")
                 val latitide = result?.get(0).toString()
                 val longitude = result?.get(1).toString()
-                listener.updateText(latitide, longitude)
+
 //                binding.LongitudeText.text = longitude
 //                binding.latitudeText.text = latitide
 //                binding.LongitudeText.visibility = View.VISIBLE
 //                binding.latitudeText.visibility = View.VISIBLE
-                calculateDistance(finalLatitude=finalLatitude.toString(),
+                val distance = calculateDistance(finalLatitude=finalLatitude.toString(),
                     finalLongitude = finalLongitude.toString(),
                     latitude = latitide,
                     longitude = longitude)
+
+                listener.updateText(latitide, longitude, distance)
 
             }
 

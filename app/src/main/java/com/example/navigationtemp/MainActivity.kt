@@ -79,11 +79,18 @@ class MainActivity : AppCompatActivity(), DetectLocation.UpdateUI {
 
     }
 
-    override fun updateText(latitude: String, longitude: String) {
+    override fun updateText(latitude: String, longitude: String, distance: Double) {
         binding.latitudeText.visibility = View.VISIBLE
         binding.longitudeText.visibility = View.VISIBLE
         binding.latitudeText.text = latitude
         binding.longitudeText.text = longitude
+        val dis_m = distance * 1000
+        binding.distance.text = "Distance = " + String.format("%.3f", dis_m) + "m"
+        if(dis_m > 10000){
+            binding.status.text = "False"
+        }else{
+            binding.status.text = "True"
+        }
     }
 
     override fun makeProgressBarVisible() {
